@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+
+# NOTE: model files (models/*.pkl) are intentionally NOT ignored —
+# Render needs them committed to the repo to load at runtime.

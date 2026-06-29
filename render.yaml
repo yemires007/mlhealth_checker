@@ -1,0 +1,15 @@
+# Render Blueprint — deploys ML Health (disease prediction) as a free web service.
+# On Render: New + -> Blueprint -> connect this repo. Render reads this file.
+#
+# NOTE: scikit-learn 1.2.2 / numpy 1.24.4 need Python 3.11 (no wheels for 3.12),
+# and the model .pkl files must be trained with the SAME scikit-learn version.
+services:
+  - type: web
+    name: ml-health
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"

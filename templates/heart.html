@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heart Disease Prediction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">ML Health</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a class="active" href="/heart">Heart Disease</a></li>
+      <li><a href="/obesity">Obesity</a></li>
+      <li><a href="/symptoms">Symptoms</a></li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <h2>Heart Disease Prediction</h2>
+
+    <form class="form">
+      <input type="number" id="age" placeholder="Age" min="1" max="120" />
+      <select id="gender">
+        <option value="" disabled selected>Select Gender</option>
+        <option value="0">Female</option>
+        <option value="1">Male</option>
+      </select>
+      <input type="number" id="impluse" placeholder="Heart Rate" min="30" max="220" />
+      <input type="number" id="pressurehight" placeholder="Systolic BP" min="50" max="250" />
+      <input type="number" id="pressurelow" placeholder="Diastolic BP" min="30" max="150" />
+      <input type="number" id="glucose" placeholder="Blood Sugar" min="40" max="600" />
+      <input type="number" id="kcm" placeholder="CK-MB" min="0" max="500" step="0.1" />
+      <input type="number" id="troponin" placeholder="Troponin" min="0" max="100" step="0.01" />
+      <button type="button" onclick="predictHeart()">Predict</button>
+    </form>
+
+    <p class="result">Prediction Result Will Appear Here</p>
+  </main>
+
+  <script>
+    async function predictHeart() {
+      const age = parseFloat(document.getElementById("age").value);
+      const gender = parseInt(document.getElementById("gender").value);
+      const impluse = parseFloat(document.getElementById("impluse").value);
+      const pressurehight = parseFloat(document.getElementById("pressurehight").value);
+      const pressurelow = parseFloat(document.getElementById("pressurelow").value);
+      const glucose = parseFloat(document.getElementById("glucose").value);
+      const kcm = parseFloat(document.getElementById("kcm").value);
+      const troponin = parseFloat(document.getElementById("troponin").value);
+
+      if ([age, gender, impluse, pressurehight, pressurelow, glucose, kcm, troponin].some(v => isNaN(v) || v < 0)) {
+        alert("Please fill all fields with valid positive numbers.");
+        return;
+      }
+
+      const data = { age, gender, impluse, pressurehight, pressurelow, glucose, kcm, troponin };
+
+      try {
+        const response = await fetch("/predict/heart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        document.querySelector(".result").innerText = "Prediction: " + result.prediction;
+      } catch (error) {
+        console.error(error);
+        alert("Error connecting to server.");
+      }
+    }
+  </script>
+</body>
+</html>

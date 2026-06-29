@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obesity Prediction</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">ML Health</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/heart">Heart Disease</a></li>
+      <li><a class="active" href="/obesity">Obesity</a></li>
+      <li><a href="/symptoms">Symptoms</a></li>
+    </ul>
+  </nav>
+
+  <main class="content">
+    <h2>Obesity Classification</h2>
+
+    <form class="form">
+      <input type="number" id="age" placeholder="Age" min="1" max="120" />
+      <select id="gender">
+        <option value="" disabled selected>Select Gender</option>
+        <option value="0">Female</option>
+        <option value="1">Male</option>
+      </select>
+      <input type="number" id="height" placeholder="Height (cm)" min="50" max="250" />
+      <input type="number" id="weight" placeholder="Weight (kg)" min="10" max="300" />
+      <button type="button" onclick="predictObesity()">Predict</button>
+    </form>
+
+    <p class="result" id="predictionResult">Prediction Result Will Appear Here</p>
+  </main>
+
+  <script>
+    async function predictObesity() {
+      const age = parseFloat(document.getElementById("age").value);
+      const gender = parseInt(document.getElementById("gender").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const weight = parseFloat(document.getElementById("weight").value);
+
+      if ([age, gender, height, weight].some(v => isNaN(v) || v < 0)) {
+        alert("Please fill all fields with valid positive numbers.");
+        return;
+      }
+
+      const data = { age, gender, height, weight };
+
+      try {
+        const response = await fetch("/predict/obesity", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        const resultEl = document.getElementById("predictionResult");
+        const prediction = (result.prediction || "").toLowerCase();
+
+        if (prediction === "obese") {
+          resultEl.innerHTML = "&#9888; Obesity Classification: <strong>Obese</strong>";
+          resultEl.style.color = "red"; resultEl.style.backgroundColor = "#ffe5e5";
+        } else if (prediction === "overweight") {
+          resultEl.innerHTML = "&#9888; Obesity Classification: <strong>Overweight</strong>";
+          resultEl.style.color = "orange"; resultEl.style.backgroundColor = "#fff3e5";
+        } else if (prediction === "normal weight") {
+          resultEl.innerHTML = "&#10004; Obesity Classification: <strong>Normal Weight</strong>";
+          resultEl.style.color = "green"; resultEl.style.backgroundColor = "#e5ffe5";
+        } else {
+          resultEl.innerHTML = "Classification: <strong>" + result.prediction + "</strong>";
+          resultEl.style.color = "black"; resultEl.style.backgroundColor = "#f0f0f0";
+        }
+        resultEl.style.padding = "10px";
+        resultEl.style.borderRadius = "8px";
+      } catch (error) {
+        console.error(error);
+        alert("Error connecting to server.");
+      }
+    }
+  </script>
+</body>
+</html>
