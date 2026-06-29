@@ -11,6 +11,12 @@ Models are loaded from `models/*.pkl`. Loading is **graceful**: a missing model
 doesn't crash the app — that prediction returns a clear "model unavailable"
 message, and you can see what loaded at `/health`.
 
+It also has **user accounts** (sign up / log in), a **saved health-check
+history**, a **dashboard**, a **health-analysis** page, and a rule-based
+**health assistant chatbot** (healthy ranges, symptom hints, which-check
+guidance, with safety disclaimers). Predictions are saved to your history when
+you're logged in.
+
 ## Run locally
 
 ```bash

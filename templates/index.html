@@ -1,25 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ML Health Predictor | Home</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-  <nav class="navbar">
-    <div class="logo">ML Health</div>
-    <ul class="nav-links">
-      <li><a class="active" href="/">Home</a></li>
-      <li><a href="/heart">Heart Disease</a></li>
-      <li><a href="/obesity">Obesity</a></li>
-      <li><a href="/symptoms">Symptoms</a></li>
-    </ul>
-  </nav>
+{% extends "base.html" %}
+{% block title %}ML Health Predictor | Home{% endblock %}
 
+{% block content %}
   <main class="content">
     <h1>Healthcare Machine Learning System</h1>
-    <p>Select a prediction operation from the navigation bar.</p>
+    <p>Predict heart-disease risk, classify obesity, and explore symptom-based
+       predictions. {% if not user %}<a href="/signup">Create an account</a> to
+       save your results and see your health dashboard.{% endif %}</p>
 
     <div class="cards">
       <div class="card">
@@ -27,19 +14,18 @@
         <p>Predict the likelihood of a heart attack.</p>
         <a href="/heart">Go &rarr;</a>
       </div>
-
       <div class="card">
         <h3>Obesity Classification</h3>
         <p>Classify obesity level using BMI data.</p>
         <a href="/obesity">Go &rarr;</a>
       </div>
-
       <div class="card">
         <h3>Disease Prediction</h3>
         <p>Predict disease based on symptoms.</p>
         <a href="/symptoms">Go &rarr;</a>
       </div>
     </div>
+
+    <p class="disclaimer">⚕️ Educational demo — not medical advice.</p>
   </main>
-</body>
-</html>
+{% endblock %}

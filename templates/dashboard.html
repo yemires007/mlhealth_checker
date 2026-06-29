@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ML Health{% endblock %}
+
+{% block content %}
+  <main class="content">
+    <h2>Your health dashboard</h2>
+
+    <div class="stats">
+      <div class="stat"><span class="lab">Total checks</span><div class="val">{{ total }}</div></div>
+      <div class="stat"><span class="lab">Heart checks</span><div class="val">{{ counts.heart }}</div></div>
+      <div class="stat"><span class="lab">Obesity checks</span><div class="val">{{ counts.obesity }}</div></div>
+      <div class="stat"><span class="lab">Flagged results</span><div class="val flag">{{ flagged }}</div></div>
+    </div>
+
+    <div class="quick">
+      <a href="/heart" class="qbtn">New heart check</a>
+      <a href="/obesity" class="qbtn">New obesity check</a>
+      <a href="/symptoms" class="qbtn">New symptom check</a>
+      <a href="/analysis" class="qbtn">View analysis</a>
+    </div>
+
+    <section class="panel">
+      <h3>Recent checks</h3>
+      {% if checks %}
+      <table class="rows">
+        <tbody>
+          {% for ch in checks %}
+          <tr>
+            <td><span class="pill {{ ch.kind }}">{{ ch.kind }}</span></td>
+            <td class="summary">{{ ch.summary }}<span class="when">{{ ch.created_at | nice_dt }}</span></td>
+            <td class="res {{ 'flagged' if ch.flagged }}">{{ ch.result }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="muted">No checks yet — run a prediction and it'll show up here.</p>
+      {% endif %}
+    </section>
+
+    <p class="disclaimer">⚕️ Educational demo — not medical advice.</p>
+  </main>
+{% endblock %}

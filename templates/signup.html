@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign up — ML Health{% endblock %}
+
+{% block content %}
+  <main class="content">
+    <div class="auth-card">
+      <h2>Create an account</h2>
+      <form method="POST" action="/signup" class="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="name" placeholder="Full name" value="{{ form.name if form else '' }}" required />
+        <input type="text" name="username" placeholder="Username" value="{{ form.username if form else '' }}" required />
+        <input type="password" name="password" placeholder="Password (min 6 chars)" minlength="6" required />
+        <input type="password" name="confirm" placeholder="Confirm password" minlength="6" required />
+        <button type="submit">Sign up</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="/login">Log in</a></p>
+    </div>
+  </main>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ML Health{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">ML Health</div>
+    <ul class="nav-links">
+      <li><a href="/" class="{{ 'active' if request.path == '/' }}">Home</a></li>
+      <li><a href="/heart" class="{{ 'active' if request.path == '/heart' }}">Heart</a></li>
+      <li><a href="/obesity" class="{{ 'active' if request.path == '/obesity' }}">Obesity</a></li>
+      <li><a href="/symptoms" class="{{ 'active' if request.path == '/symptoms' }}">Symptoms</a></li>
+      {% if user %}
+      <li><a href="/dashboard" class="{{ 'active' if request.path == '/dashboard' }}">Dashboard</a></li>
+      <li><a href="/analysis" class="{{ 'active' if request.path == '/analysis' }}">Analysis</a></li>
+      {% endif %}
+    </ul>
+    <div class="nav-auth">
+      {% if user %}
+        <span class="who">Hi, {{ user.name.split(' ')[0] }}</span>
+        <a href="/logout" class="auth-btn">Log out</a>
+      {% else %}
+        <a href="/login">Log in</a>
+        <a href="/signup" class="auth-btn">Sign up</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="flash-wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+
+  {% block content %}{% endblock %}
+
+  <!-- Health assistant -->
+  <button id="chat-toggle" class="chat-toggle" aria-label="Ask the health assistant" title="Health assistant">&#128172;</button>
+  <div id="chat-panel" class="chat-panel" hidden>
+    <div class="chat-head">
+      <span><i class="chat-dot"></i> Health Assistant</span>
+      <button id="chat-close" aria-label="Close">&times;</button>
+    </div>
+    <div id="chat-body" class="chat-body"></div>
+    <div class="chat-suggest" id="chat-suggest">
+      <button type="button" data-q="What's a normal blood pressure?">Normal BP</button>
+      <button type="button" data-q="What could cause fever and cough?">Fever + cough</button>
+      <button type="button" data-q="Which check should I use?">Which check?</button>
+    </div>
+    <form id="chat-form" class="chat-input">
+      <input id="chat-text" type="text" placeholder="Ask a health question…" autocomplete="off" maxlength="500">
+      <button type="submit" aria-label="Send">&#10148;</button>
+    </form>
+  </div>
+
+  <script src="{{ url_for('static', filename='chat.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,22 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Symptoms Disease Prediction</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
-<body>
-  <nav class="navbar">
-    <div class="logo">ML Health</div>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/heart">Heart Disease</a></li>
-      <li><a href="/obesity">Obesity</a></li>
-      <li><a class="active" href="/symptoms">Symptoms</a></li>
-    </ul>
-  </nav>
+{% extends "base.html" %}
+{% block title %}Symptoms Disease Prediction{% endblock %}
 
+{% block content %}
   <main class="content">
     <h2>Disease Prediction from Symptoms</h2>
 
@@ -42,43 +27,36 @@
 
     <p class="result">Predicted Disease Will Appear Here</p>
   </main>
+{% endblock %}
 
+{% block scripts %}
   <script>
     function addSymptom(name) {
       const ta = document.getElementById("symp");
       const label = name.replace(/_/g, " ");
       const parts = ta.value.split(",").map(s => s.trim()).filter(Boolean);
-      if (parts.includes(label)) return;          // no duplicates
+      if (parts.includes(label)) return;
       parts.push(label);
       ta.value = parts.join(", ");
     }
-
     async function predictDisease() {
       const age = parseFloat(document.getElementById("age").value);
-      const gender = parseInt(document.getElementById("gender").value);   // 0 or 1
+      const gender = parseInt(document.getElementById("gender").value);
       const symptom = document.getElementById("symp").value.trim();
       const symptom_count = symptom === "" ? 0 : symptom.split(",").filter(s => s.trim()).length;
-
       if (isNaN(age) || age <= 0 || isNaN(gender) || symptom_count === 0) {
         alert("Please fill all fields with valid values.");
         return;
       }
-
       const data = { age, gender, symptom, symptom_count };
-
       try {
         const response = await fetch("/predict/symptoms", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
         const result = await response.json();
         document.querySelector(".result").innerText = "Prediction: " + result.prediction;
-      } catch (error) {
-        console.error(error);
-        alert("Error connecting to server.");
-      }
+      } catch (error) { console.error(error); alert("Error connecting to server."); }
     }
   </script>
-</body>
-</html>
+{% endblock %}

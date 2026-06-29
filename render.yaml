@@ -13,3 +13,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      - key: SECRET_KEY
+        generateValue: true     # Render generates a strong session secret
