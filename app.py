@@ -13,6 +13,7 @@ clear "model unavailable" message instead of crashing the whole service.
 Run locally:
     python app.py        # http://127.0.0.1:5003
 """
+import json
 import os
 from pathlib import Path
 
@@ -49,9 +50,23 @@ def load_model(filename):
 
 heart_model = load_model("heart_model.pkl")
 obesity_model = load_model("obesity_model.pkl")
-# Symptoms needs its own model. (The original hearts_model.pkl is actually a
-# 15-feature heart model, not a symptoms classifier, so it's not used here.)
+# Symptoms needs its own model + the symptom vocabulary it was trained on.
+# (The original hearts_model.pkl is actually a 15-feature heart model, not a
+# symptoms classifier, so it's not used here. Run train_symptoms.py to create a
+# real symptoms_model.pkl + symptoms_columns.json.)
 symptoms_model = load_model("symptoms_model.pkl")
+
+SYMPTOM_VOCAB = []
+_vocab_path = MODELS_DIR / "symptoms_columns.json"
+if _vocab_path.exists():
+    try:
+        SYMPTOM_VOCAB = json.loads(_vocab_path.read_text())
+    except Exception as exc:  # noqa: BLE001
+        app.logger.warning("Failed to read symptom vocabulary: %s", exc)
+
+
+def normalise_symptom(text):
+    return text.strip().lower().replace(" ", "_")
 
 
 def model_unavailable(name):
@@ -81,7 +96,7 @@ def obesity_page():
 
 @app.route("/symptoms")
 def symptoms_page():
-    return render_template("symptoms.html")
+    return render_template("symptoms.html", symptom_vocab=SYMPTOM_VOCAB)
 
 
 # --------------------------------------------------------------------------- #
@@ -142,15 +157,20 @@ def predict_obesity():
 # --------------------------------------------------------------------------- #
 @app.route("/predict/symptoms", methods=["POST"])
 def predict_symptoms():
-    if symptoms_model is None:
+    if symptoms_model is None or not SYMPTOM_VOCAB:
         return model_unavailable("symptoms")
     try:
         d = request.get_json(force=True)
-        age = float(d["age"]); gender = float(d["gender"])
-        symptom_count = float(d.get("symptom_count", 0))
-        # NOTE: must match the feature encoding used when the model was trained.
-        features = np.array([[age, gender, symptom_count]])
-        disease = symptoms_model.predict(features)[0]
+        text = str(d.get("symptom", ""))
+        tokens = {normalise_symptom(t) for t in text.split(",") if t.strip()}
+        vector = [1 if s in tokens else 0 for s in SYMPTOM_VOCAB]
+        if sum(vector) == 0:
+            return jsonify(
+                error=True,
+                prediction="None of those match the recognised symptoms — "
+                           "pick from the listed ones.",
+            ), 400
+        disease = symptoms_model.predict(np.array([vector]))[0]
         return jsonify(prediction=str(disease))
     except Exception as exc:  # noqa: BLE001
         return jsonify(error=True, prediction=f"Could not predict: {exc}"), 400

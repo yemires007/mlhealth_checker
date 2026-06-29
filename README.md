@@ -4,7 +4,8 @@ A Flask app serving three scikit-learn models behind a simple multi-page UI:
 
 - **Heart-disease risk** (Random Forest) — from vitals and blood markers.
 - **Obesity classification** — from age, gender, height, weight (BMI computed).
-- **Disease from symptoms** — from age, gender, and symptom count.
+- **Disease from symptoms** — multi-hot symptom vector → likely condition
+  (illustrative model; see `train_symptoms.py`).
 
 Models are loaded from `models/*.pkl`. Loading is **graceful**: a missing model
 doesn't crash the app — that prediction returns a clear "model unavailable"
@@ -31,13 +32,25 @@ Open **http://127.0.0.1:5003**.
   instead of a 500.
 - Fixed the symptoms page's gender bug (the form never submitted before).
 
+## The symptoms model
+`train_symptoms.py` builds an **illustrative** symptom→disease classifier from a
+small curated knowledge base, saving `models/symptoms_model.pkl` and
+`models/symptoms_columns.json` (the symptom vocabulary the app vectorises
+against). It's a working ML demo, not medical advice — swap in a real labelled
+dataset to make it authoritative. Retrain with:
+```bash
+python train_symptoms.py
+```
+
 ## Files
 ```
 diseaseprediction/
 ├── app.py                  # routes + model loading + prediction
+├── train_symptoms.py       # trains the illustrative symptoms model
 ├── templates/              # index, heart, obesity, symptoms
 ├── static/styles.css
-├── models/                 # heart_model.pkl, obesity_model.pkl, symptoms_model.pkl
+├── models/                 # heart_model.pkl, obesity_model.pkl,
+│                           # symptoms_model.pkl, symptoms_columns.json
 ├── requirements.txt
 ├── render.yaml, Procfile   # Render deploy config
 └── README.md

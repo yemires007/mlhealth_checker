@@ -27,14 +27,32 @@
         <option value="0">Female</option>
         <option value="1">Male</option>
       </select>
-      <textarea id="symp" placeholder="Enter symptoms separated by commas"></textarea>
+      <textarea id="symp" placeholder="Enter symptoms separated by commas (e.g. fever, cough)"></textarea>
       <button type="button" onclick="predictDisease()">Predict</button>
     </form>
+
+    {% if symptom_vocab %}
+    <p class="hint">Click symptoms to add them (illustrative demo model):</p>
+    <div class="symptom-chips">
+      {% for s in symptom_vocab %}
+      <button type="button" class="chip" onclick="addSymptom('{{ s }}')">{{ s.replace('_', ' ') }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
 
     <p class="result">Predicted Disease Will Appear Here</p>
   </main>
 
   <script>
+    function addSymptom(name) {
+      const ta = document.getElementById("symp");
+      const label = name.replace(/_/g, " ");
+      const parts = ta.value.split(",").map(s => s.trim()).filter(Boolean);
+      if (parts.includes(label)) return;          // no duplicates
+      parts.push(label);
+      ta.value = parts.join(", ");
+    }
+
     async function predictDisease() {
       const age = parseFloat(document.getElementById("age").value);
       const gender = parseInt(document.getElementById("gender").value);   // 0 or 1
