@@ -49,14 +49,15 @@ def load_model(filename):
 
 heart_model = load_model("heart_model.pkl")
 obesity_model = load_model("obesity_model.pkl")
+# Symptoms needs its own model. (The original hearts_model.pkl is actually a
+# 15-feature heart model, not a symptoms classifier, so it's not used here.)
 symptoms_model = load_model("symptoms_model.pkl")
 
 
 def model_unavailable(name):
     return jsonify(
         error=True,
-        prediction=f"The {name} model isn't available on the server yet. "
-                   f"Add models/{name}_model.pkl and redeploy.",
+        prediction=f"The {name} predictor isn't available in this demo yet.",
     ), 503
 
 
